@@ -28,7 +28,7 @@ EMAIL_SUBJECT = 'Modulo autorización'
 EMAIL_CONTENT = "Acceso "
 
 
-#Notificación a Android
+#____________________________________Notificación a Android____________________________________
 def fcmService(tipo):
     global EMAIL_CONTENT
     push_service = FCMNotification(api_key="AIzaSyCmvxnrqEFD5nwkH_n4RB-ItWLVFsYwCfI")
@@ -58,7 +58,7 @@ def fcmService(tipo):
     print(payload)
     return tipoHuella
 
-#---------------- GMAIL API ---------------------
+#____________________________________ GMAIL API ____________________________________
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/gmail.send'
 

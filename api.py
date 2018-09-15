@@ -1,26 +1,17 @@
 # Send to single device.
 from __future__ import print_function
 
-#from googleapiclient import discovery
 import base64
 from email.mime.text import MIMEText
 
-from googleapiclient import discovery, errors
-from googleapiclient.errors import  HttpError
+from googleapiclient import errors
 from googleapiclient.discovery import build
 from httplib2 import Http
 
-from google.oauth2 import service_account
-import urllib3
 from oauth2client import file, client, tools
 
-from distutils.command.config import config
-
-from pip._internal.wheel import message_about_scripts_not_on_PATH
 from pyfcm import FCMNotification
 from flask import Flask
-from flask import request
-
 
 app = Flask(__name__)
 
@@ -30,14 +21,14 @@ tipoHuella = None
 
 mensaje = None
 
-# Email variables. Modify this!
+# Variables del correo a enviar
 EMAIL_FROM = 'gomzalo@outlook.com'
 EMAIL_TO = 'usaccarlosgrupounoarqui@gmail.com'
 EMAIL_SUBJECT = 'Modulo autorización'
 EMAIL_CONTENT = "Acceso "
 
 
-
+#Notificación a Android
 def fcmService(tipo):
     global EMAIL_CONTENT
     push_service = FCMNotification(api_key="AIzaSyCmvxnrqEFD5nwkH_n4RB-ItWLVFsYwCfI")
@@ -71,7 +62,7 @@ def fcmService(tipo):
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/gmail.send'
 
-
+#Obtener credenciales
 def getCred():
     store = file.Storage('token.json')
     creds = store.get()

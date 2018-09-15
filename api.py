@@ -30,7 +30,6 @@ EMAIL_CONTENT = "Acceso "
 
 #____________________________________Notificación a Android____________________________________
 def fcmService(tipo):
-    global EMAIL_CONTENT
     push_service = FCMNotification(api_key="AIzaSyCmvxnrqEFD5nwkH_n4RB-ItWLVFsYwCfI")
 
     if tipo == "1":
@@ -54,7 +53,7 @@ def fcmService(tipo):
 
     global payload
     payload = push_service.parse_payload(topic_name=topic_name,message_body=message_body,message_title=message_title,low_priority=low_priority,content_available=content_available)
-    push_service.send_request([payload], timeout=1)
+    push_service.send_request([payload], timeout=10)
     print(payload)
     return tipoHuella
 

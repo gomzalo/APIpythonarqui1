@@ -33,29 +33,31 @@ mensaje = None
 # Email variables. Modify this!
 EMAIL_FROM = 'gomzalo@outlook.com'
 EMAIL_TO = 'usaccarlosgrupounoarqui@gmail.com'
-EMAIL_SUBJECT = 'Prueba'
-EMAIL_CONTENT = 'alv prro :v'
+EMAIL_SUBJECT = 'Modulo autorización'
+EMAIL_CONTENT = "Acceso "
 
 
 
 def fcmService(tipo):
-#    global tipoHuella
+    global EMAIL_CONTENT
     push_service = FCMNotification(api_key="AIzaSyCmvxnrqEFD5nwkH_n4RB-ItWLVFsYwCfI")
-
-#    print("tipo: "+str(tipo))
 
     if tipo == "1":
         global tipoHuella
-        tipoHuella = "correcta, se abrio la puerta"
+        global EMAIL_CONTENT
+        tipoHuella = "correcto, se accedio al hogar"
+        EMAIL_CONTENT += tipoHuella
     elif tipo == "0":
-        tipoHuella = "incorrecta, no se abrio la puerta"
+        tipoHuella = "incorrecto, no se accedio al hogar"
+        EMAIL_CONTENT += tipoHuella
     elif tipo == "2":
-        tipoHuella = "incorrecta por tercera vez, se ha bloqueado el ingreso"
+        tipoHuella = "incorrecto por tercera vez, el sistema se encuentra bloqueado"
+        EMAIL_CONTENT += tipoHuella
 
 
     topic_name = "Arqui1"
     message_title = "Modulo autorizacion"
-    message_body = "La huella es " + str(tipoHuella)
+    message_body = "Acceso " + str(tipoHuella)
     low_priority = False
     content_available = True
 
@@ -126,12 +128,12 @@ def send_message(service, user_id, message):
 
 @app.route("/<num>")
 def setNum(num):
+    global EMAIL_CONTENT
     global mensaje
     num = num
     fcmService(num)
 
     service = getCred()
-#    service = service_account_login()
     mensaje = create_message(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_CONTENT)
     send_message(service,'me', mensaje)
     return str(payload)

@@ -1,5 +1,6 @@
-runtime: python36
+runtime: python37
 
 handlers:
 - url: /.*
-  script: auto
+  script: api.main.py
+  secure: always

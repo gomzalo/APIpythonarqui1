@@ -2,8 +2,16 @@
 from __future__ import print_function
 
 #from googleapiclient import discovery
+import base64
+from email.mime.text import MIMEText
+
+from googleapiclient import discovery, errors
+from googleapiclient.errors import  HttpError
 from googleapiclient.discovery import build
 from httplib2 import Http
+
+from google.oauth2 import service_account
+import urllib3
 from oauth2client import file, client, tools
 
 from distutils.command.config import config
@@ -19,6 +27,16 @@ app = Flask(__name__)
 payload = None
 
 tipoHuella = None
+
+mensaje = None
+
+# Email variables. Modify this!
+EMAIL_FROM = 'gomzalo@outlook.com'
+EMAIL_TO = 'usaccarlosgrupounoarqui@gmail.com'
+EMAIL_SUBJECT = 'Prueba'
+EMAIL_CONTENT = 'alv prro :v'
+
+
 
 def fcmService(tipo):
 #    global tipoHuella
@@ -45,15 +63,14 @@ def fcmService(tipo):
     payload = push_service.parse_payload(topic_name=topic_name,message_body=message_body,message_title=message_title,low_priority=low_priority,content_available=content_available)
     push_service.send_request([payload], timeout=1)
     print(payload)
+    return tipoHuella
 
 #---------------- GMAIL API ---------------------
 # If modifying these scopes, delete the file token.json.
-SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
+SCOPES = 'https://www.googleapis.com/auth/gmail.send'
 
-def gmailTest():
-    """Shows basic usage of the Gmail API.
-    Lists the user's Gmail labels.
-    """
+
+def getCred():
     store = file.Storage('token.json')
     creds = store.get()
     if not creds or creds.invalid:
@@ -61,23 +78,62 @@ def gmailTest():
         creds = tools.run_flow(flow, store)
     service = build('gmail', 'v1', http=creds.authorize(Http()))
 
-    # Call the Gmail API
-    results = service.users().labels().list(userId='me').execute()
-    labels = results.get('labels', [])
+    return service
 
-    if not labels:
-        print('No labels found.')
-    else:
-        print('Labels:')
-        for label in labels:
-            print(label['name'])
 
+def create_message(sender, to, subject, message_text):
+  """Create a message for an email.
+
+  Args:
+    sender: Email address of the sender.
+    to: Email address of the receiver.
+    subject: The subject of the email message.
+    message_text: The text of the email message.
+
+  Returns:
+    An object containing a base64url encoded email object.
+  """
+  message = MIMEText(message_text)
+  message['to'] = to
+  message['from'] = sender
+  message['subject'] = subject
+  return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
+
+
+def send_message(service, user_id, message):
+  """Send an email message.
+
+  Args:
+    service: Authorized Gmail API service instance.
+    user_id: User's email address. The special value "me"
+    can be used to indicate the authenticated user.
+    message: Message to be sent.
+
+  Returns:
+    Sent Message.
+  """
+  try:
+    message = (service.users().messages().send(userId=user_id, body=message)
+               .execute())
+    print('Message Id: %s' % message['id'])
+    return message
+  except errors.HttpError as error:
+      print('An error occurred: %s' % error)
+        #print('An error occurred: %s' % error)
+        #print (f'An error occurred: %s: {% error}')
+
+#____________________________________ WEB SERICE ______________________________________________
 
 @app.route("/<num>")
 def setNum(num):
+    global mensaje
     num = num
     fcmService(num)
-    gmailTest()
+
+    service = getCred()
+#    service = service_account_login()
+    mensaje = create_message(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_CONTENT)
+    send_message(service,'me', mensaje)
     return str(payload)
 
 if __name__ == '__main__':

@@ -1,6 +1,15 @@
 runtime: python37
 
+api_version: 1
+#threadsafe: true
+
 handlers:
 - url: /.*
-  script: api.main.py
-  secure: always
+  script: api.main.app
+
+
+
+#handlers:
+#- url: /.*
+#  script: api.main.py
+#  secure: always

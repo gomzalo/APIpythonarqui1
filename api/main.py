@@ -25,7 +25,7 @@ mensaje = None
 EMAIL_FROM = 'gomzalo@outlook.com'
 EMAIL_TO = 'usaccarlosgrupounoarqui@gmail.com'
 EMAIL_SUBJECT = 'Modulo autorización'
-EMAIL_CONTENT = "Acceso "
+EMAIL_CONTENT = ""
 
 
 #____________________________________Notificación a Android____________________________________
@@ -35,25 +35,25 @@ def fcmService(tipo):
     if tipo == "1":
         global tipoHuella
         global EMAIL_CONTENT
-        tipoHuella = "correcto, se accedio al hogar"
-        EMAIL_CONTENT += tipoHuella
+        tipoHuella = "Acceso correcto, se accedio al hogar"
+        EMAIL_CONTENT = tipoHuella
     elif tipo == "0":
-        tipoHuella = "incorrecto, no se accedio al hogar"
-        EMAIL_CONTENT += tipoHuella
+        tipoHuella = "Acceso incorrecto, no se accedio al hogar"
+        EMAIL_CONTENT = tipoHuella
     elif tipo == "2":
-        tipoHuella = "incorrecto por tercera vez, el sistema se encuentra bloqueado"
-        EMAIL_CONTENT += tipoHuella
+        tipoHuella = "Acceso incorrecto por tercera vez, el sistema se encuentra bloqueado"
+        EMAIL_CONTENT = tipoHuella
 
 
     topic_name = "Arqui1"
     message_title = "Modulo autorizacion"
-    message_body = "Acceso " + str(tipoHuella)
+    message_body = str(tipoHuella)
     low_priority = False
     content_available = True
 
     global payload
     payload = push_service.parse_payload(topic_name=topic_name,message_body=message_body,message_title=message_title,low_priority=low_priority,content_available=content_available)
-    push_service.send_request([payload], timeout=10)
+    push_service.send_request([payload], timeout=4)
     print(payload)
     return tipoHuella
 
@@ -111,8 +111,6 @@ def send_message(service, user_id, message):
     return message
   except errors.HttpError as error:
       print('An error occurred: %s' % error)
-        #print('An error occurred: %s' % error)
-        #print (f'An error occurred: %s: {% error}')
 
 #____________________________________ WEB SERICE ______________________________________________
 

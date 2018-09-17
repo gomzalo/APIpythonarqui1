@@ -4,6 +4,8 @@ from __future__ import print_function
 import base64
 from email.mime.text import MIMEText
 
+from pymongo import MongoClient
+
 from googleapiclient import errors
 from googleapiclient.discovery import build
 from httplib2 import Http
@@ -27,7 +29,13 @@ EMAIL_TO = 'usaccarlosgrupounoarqui@gmail.com'
 EMAIL_SUBJECT = 'Modulo autorización'
 EMAIL_CONTENT = ""
 
+#____________________________________Base de datos____________________________________
+pymongo = MongoClient()
+uri = "mongodb://dbarqui1grupo1:Vvw81LEzH7OSVZUpr2eLXSkIueS6WEvkDzPbr1YTudlpRbLX4dxZKnxAzyZvyFU2rlPKeGLT8WhvvUKmbRSYPQ==@dbarqui1grupo1.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
+client = MongoClient(uri)
 
+db = client.BDnotification
+collection = db.Piscina
 #____________________________________Notificación a Android____________________________________
 def fcmService(tipo):
     push_service = FCMNotification(api_key="AIzaSyCmvxnrqEFD5nwkH_n4RB-ItWLVFsYwCfI")
@@ -44,6 +52,14 @@ def fcmService(tipo):
         tipoHuella = "Acceso incorrecto por tercera vez, el sistema se encuentra bloqueado"
         EMAIL_CONTENT = tipoHuella
 
+
+    #:.........................................................................
+    post = {"tipo": "huella",
+            "estado": "\""+tipoHuella+"\""
+            }
+    posts = db.Piscina
+    posts.insert_one(post).inserted_id
+    #:.........................................................................
 
     topic_name = "Arqui1"
     message_title = "Modulo autorizacion"
@@ -124,6 +140,7 @@ def setNum(num):
     service = getCred()
     mensaje = create_message(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_CONTENT)
     send_message(service,'me', mensaje)
+
     return str(payload)
 
 if __name__ == '__main__':
